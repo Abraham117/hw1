@@ -38,7 +38,7 @@
 #define WINDOW_WIDTH  800
 #define WINDOW_HEIGHT 600
 
-#define MAX_PARTICLES 10000
+#define MAX_PARTICLES 45000
 #define GRAVITY 0.2
 #define rnd() (float)rand() / (float)RAND_MAX
 
@@ -79,8 +79,8 @@ void init_opengl(void);
 void cleanupXWindows(void);
 void check_mouse(XEvent *e, Game *game);
 int check_keys(XEvent *e, Game *game);
-void movement(Game *game);
-void render(Game *game);
+void movement(Game *game, Game *game1, Game *game2, Game *game3, Game *game4);
+void render(Game *game, Game *game1, Game *game2, Game *game3, Game *game4);
 
 
 int main(void)
@@ -89,15 +89,68 @@ int main(void)
 	srand(time(NULL));
 	initXWindows();
 	init_opengl();
+
+//-----------------------------------------------------------
+
 	//declare game object
 	Game game;
 	game.n=0;
 
 	//declare a box shape
-	game.box.width = 100;
-	game.box.height = 10;
-	game.box.center.x = 120 + 5*65;
-	game.box.center.y = 500 - 5*60;
+	game.box.width = 90;
+	game.box.height = 20;
+	game.box.center.x = 150;     //original 120 + 5*65
+	game.box.center.y = 480;   //original 500 - 5*60
+
+//-----------------------------------------------------------
+
+	//declare game object1
+	Game game1;
+	game1.n=0;
+
+	//declare a box shape
+	game1.box.width = 90;
+	game1.box.height = 20;
+	game1.box.center.x = 230;     //original 120 + 5*65
+	game1.box.center.y = 420;   //original 500 - 5*60
+
+//-----------------------------------------------------------
+
+	//declare game object2
+	Game game2;
+	game2.n=0;
+
+	//declare a box shape
+	game2.box.width = 90;
+	game2.box.height = 20;
+	game2.box.center.x = 310;     //original 120 + 5*65
+	game2.box.center.y = 360;   //original 500 - 5*60
+
+//-----------------------------------------------------------
+
+	//declare game object3
+	Game game3;
+	game3.n=0;
+
+	//declare a box shape
+	game3.box.width = 90;
+	game3.box.height = 20;
+	game3.box.center.x = 390;     //original 120 + 5*65
+	game3.box.center.y = 300;   //original 500 - 5*60
+
+//-----------------------------------------------------------
+
+	//declare game object4
+	Game game4;
+	game4.n=0;
+
+	//declare a box shape
+	game4.box.width = 90;
+	game4.box.height = 20;
+	game4.box.center.x = 470;     //original 120 + 5*65
+	game4.box.center.y = 240;   //original 500 - 5*60
+
+//-----------------------------------------------------------
 
 	//start animation
 	while (!done) {
@@ -107,8 +160,8 @@ int main(void)
 			check_mouse(&e, &game);
 			done = check_keys(&e, &game);
 		}
-		movement(&game);
-		render(&game);
+		movement(&game, &game1, &game2, &game3, &game4);
+		render(&game, &game1, &game2, &game3, &game4);
 		glXSwapBuffers(dpy, win);
 	}
 	cleanupXWindows();
@@ -119,7 +172,7 @@ void set_title(void)
 {
 	//Set the window title bar.
 	XMapWindow(dpy, win);
-	XStoreName(dpy, win, "335 Lab1   LMB for particle");
+	XStoreName(dpy, win, "3350 Lab1   LMB for particle");
 }
 
 void cleanupXWindows(void)
@@ -180,8 +233,8 @@ void makeParticle(Game *game, int x, int y)
 	Particle *p = &game->particle[game->n];
 	p->s.center.x = x;
 	p->s.center.y = y;
-	p->velocity.y =  rnd() * 1.5 - 0.25;
-	p->velocity.x =  rnd() * 1.5 - 0.25;
+	p->velocity.y =  rnd() * 1.0 - 0.25;
+	p->velocity.x =  rnd() * 1.0 - 0.25;
 	game->n++;
 }
 
@@ -242,7 +295,7 @@ int check_keys(XEvent *e, Game *game)
 	return 0;
 }
 
-void movement(Game *game)
+void movement(Game *game, Game *game1, Game *game2, Game *game3, Game *game4)
 {
 	Particle *p;
 
@@ -261,20 +314,78 @@ void movement(Game *game)
 		p->s.center.x += p->velocity.x;
 		p->s.center.y += p->velocity.y;
 	
+//-----------------------------------------------------------
 
-		//check for collision with shapes...
+		//check for collision with shape
 		Shape *s;
 		s = &game->box;
 		if (p->s.center.y < s->center.y + s->height &&
 			p->s.center.x >= s->center.x - s->width &&
 			p->s.center.x <= s->center.x + s->width)
-       		{
+       	{
 			p->s.center.y = s->center.y + s->height;
 			p->velocity.y = -p->velocity.y * 0.8f;
-			p->velocity.x += 0.05f;
+			p->velocity.x += 0.008f;
 		};
 	
-		
+//-----------------------------------------------------------
+
+		//check for collision with shape1
+		Shape *s1;
+		s1 = &game1->box;
+		if (p->s.center.y < s1->center.y + s1->height &&
+			p->s.center.x >= s1->center.x - s1->width &&
+			p->s.center.x <= s1->center.x + s1->width)
+       	{
+			p->s.center.y = s1->center.y + s1->height;
+			p->velocity.y = -p->velocity.y * 0.5f;
+			p->velocity.x += 0.008f;
+		};
+
+//-----------------------------------------------------------
+
+		//check for collision with shape2
+		Shape *s2;
+		s2 = &game2->box;
+		if (p->s.center.y < s2->center.y + s2->height &&
+			p->s.center.x >= s2->center.x - s2->width &&
+			p->s.center.x <= s2->center.x + s2->width)
+       	{
+			p->s.center.y = s2->center.y + s2->height;
+			p->velocity.y = -p->velocity.y * 0.45f;
+			p->velocity.x += 0.008f;
+		};
+
+//-----------------------------------------------------------
+
+		//check for collision with shape3
+		Shape *s3;
+		s3 = &game3->box;
+		if (p->s.center.y < s3->center.y + s3->height &&
+			p->s.center.x >= s3->center.x - s3->width &&
+			p->s.center.x <= s3->center.x + s3->width)
+       	{
+			p->s.center.y = s3->center.y + s3->height;
+			p->velocity.y = -p->velocity.y * 0.4f;
+			p->velocity.x += 0.008f;
+		};
+
+//-----------------------------------------------------------
+
+		//check for collision with shape4
+		Shape *s4;
+		s4 = &game4->box;
+		if (p->s.center.y < s4->center.y + s4->height &&
+			p->s.center.x >= s4->center.x - s4->width &&
+			p->s.center.x <= s4->center.x + s4->width)
+       	{
+			p->s.center.y = s4->center.y + s4->height;
+			p->velocity.y = -p->velocity.y * 0.35f;
+			p->velocity.x += 0.4f;
+		};
+
+//-----------------------------------------------------------		
+
 		//check for off-screen
 		if (p->s.center.y < 0.0) {
 			std::cout << "off screen" << std::endl;
@@ -283,15 +394,17 @@ void movement(Game *game)
 	}
 }
 
-void render(Game *game)
+void render(Game *game, Game *game1, Game *game2, Game *game3, Game *game4)
 {
 	float w, h;
 	glClear(GL_COLOR_BUFFER_BIT);
 	//Draw shapes...
 
+//-----------------------------------------------------------
+
 	//draw box
 	Shape *s;
-	glColor3ub(90,140,90);
+	glColor3ub(101,96,95);		//original 90,140,90
 	s = &game->box;
 	glPushMatrix();
 	glTranslatef(s->center.x, s->center.y, s->center.z);
@@ -305,13 +418,105 @@ void render(Game *game)
 	glEnd();
 	glPopMatrix();
 
+//-----------------------------------------------------------
+
+	//draw box1
+	Shape *s1;
+	glColor3ub(101,96,95);		//original 90,140,90
+	s1 = &game1->box;
+	glPushMatrix();
+	glTranslatef(s1->center.x, s1->center.y, s1->center.z);
+	w = s1->width;
+	h = s1->height;
+	glBegin(GL_QUADS);
+		glVertex2i(-w,-h);
+		glVertex2i(-w, h);
+		glVertex2i( w, h);
+		glVertex2i( w,-h);
+	glEnd();
+	glPopMatrix();
+
+//-----------------------------------------------------------
+
+	//draw box2
+	Shape *s2;
+	glColor3ub(101,96,95);		//original 90,140,90
+	s2 = &game2->box;
+	glPushMatrix();
+	glTranslatef(s2->center.x, s2->center.y, s2->center.z);
+	w = s2->width;
+	h = s2->height;
+	glBegin(GL_QUADS);
+		glVertex2i(-w,-h);
+		glVertex2i(-w, h);
+		glVertex2i( w, h);
+		glVertex2i( w,-h);
+	glEnd();
+	glPopMatrix();
+
+//-----------------------------------------------------------
+
+	//draw box3
+	Shape *s3;
+	glColor3ub(101,96,95);		//original 90,140,90
+	s3 = &game3->box;
+	glPushMatrix();
+	glTranslatef(s3->center.x, s3->center.y, s3->center.z);
+	w = s3->width;
+	h = s3->height;
+	glBegin(GL_QUADS);
+		glVertex2i(-w,-h);
+		glVertex2i(-w, h);
+		glVertex2i( w, h);
+		glVertex2i( w,-h);
+	glEnd();
+	glPopMatrix();
+
+//-----------------------------------------------------------
+
+	//draw box4
+	Shape *s4;
+	glColor3ub(101,96,95);		//original 90,140,90
+	s4 = &game4->box;
+	glPushMatrix();
+	glTranslatef(s4->center.x, s4->center.y, s4->center.z);
+	w = s4->width;
+	h = s4->height;
+	glBegin(GL_QUADS);
+		glVertex2i(-w,-h);
+		glVertex2i(-w, h);
+		glVertex2i( w, h);
+		glVertex2i( w,-h);
+	glEnd();
+	glPopMatrix();
+
+//-----------------------------------------------------------
+
+	int a,r,b,g;
+
 	//draw all particles here
 	for (int i = 0; i <game->n; i++) {
+		
+		a = rand()%5;
+			if(a == 1)
+			{
+				r = 73;
+				b = 113;
+				g = 156;
+
+			}
+			else
+			{	
+				r = 57;
+				b = 88;
+				g = 121;
+			}
+
 		glPushMatrix();
-		glColor3ub(150,160,220);
+		glColor3ub(r,b,g);    //original 150,160,220
 		Vec *c = &game->particle[i].s.center;
-		w = 2;
-		h = 2;
+		w = 4;
+		h = 4;
 		glBegin(GL_QUADS);
 			glVertex2i(c->x-w, c->y-h);
 			glVertex2i(c->x-w, c->y+h);
@@ -321,6 +526,3 @@ void render(Game *game)
 		glPopMatrix();
 	}
 }
-
-
-
