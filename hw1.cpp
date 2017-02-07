@@ -34,11 +34,14 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <GL/glx.h>
+//extern "C" {
+//	#include "fonts.h"
+//}
 
 #define WINDOW_WIDTH  800
 #define WINDOW_HEIGHT 600
 
-#define MAX_PARTICLES 45000
+#define MAX_PARTICLES 1000  //45000
 #define GRAVITY 0.2
 #define rnd() (float)rand() / (float)RAND_MAX
 
@@ -66,6 +69,7 @@ struct Particle {
 
 struct Game {
 	Shape box;
+	Shape ball;
 	Particle particle[MAX_PARTICLES];
 	int n;
 	int bubbler;
@@ -79,7 +83,9 @@ void init_opengl(void);
 void cleanupXWindows(void);
 void check_mouse(XEvent *e, Game *game);
 int check_keys(XEvent *e, Game *game);
-void movement(Game *game, Game *game1, Game *game2, Game *game3, Game *game4);
+void movement(Game *game, Game *game1, Game *game2, Game *game3, Game *game4, Game *game5);
+void drawFilledCircle(GLfloat x, GLfloat y, GLfloat radius);
+void drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius);
 void render(Game *game, Game *game1, Game *game2, Game *game3, Game *game4);
 
 
@@ -111,8 +117,8 @@ int main(void)
 	//declare a box shape
 	game1.box.width = 90;
 	game1.box.height = 20;
-	game1.box.center.x = 230;     //original 120 + 5*65
-	game1.box.center.y = 420;   //original 500 - 5*60
+	game1.box.center.x = 230;
+	game1.box.center.y = 420;
 
 //-----------------------------------------------------------
 
@@ -123,8 +129,8 @@ int main(void)
 	//declare a box shape
 	game2.box.width = 90;
 	game2.box.height = 20;
-	game2.box.center.x = 310;     //original 120 + 5*65
-	game2.box.center.y = 360;   //original 500 - 5*60
+	game2.box.center.x = 310;
+	game2.box.center.y = 360;
 
 //-----------------------------------------------------------
 
@@ -135,8 +141,8 @@ int main(void)
 	//declare a box shape
 	game3.box.width = 90;
 	game3.box.height = 20;
-	game3.box.center.x = 390;     //original 120 + 5*65
-	game3.box.center.y = 300;   //original 500 - 5*60
+	game3.box.center.x = 390;
+	game3.box.center.y = 300;
 
 //-----------------------------------------------------------
 
@@ -147,8 +153,19 @@ int main(void)
 	//declare a box shape
 	game4.box.width = 90;
 	game4.box.height = 20;
-	game4.box.center.x = 470;     //original 120 + 5*65
-	game4.box.center.y = 240;   //original 500 - 5*60
+	game4.box.center.x = 470;
+	game4.box.center.y = 240;
+
+//-----------------------------------------------------------
+
+	//declare circle
+	Game game5;
+	game5.n=0;
+
+	//declare circle shape
+	game5.ball.radius = 170;
+	game5.ball.center.x = 750;
+	game5.ball.center.y = 0;
 
 //-----------------------------------------------------------
 
@@ -160,7 +177,7 @@ int main(void)
 			check_mouse(&e, &game);
 			done = check_keys(&e, &game);
 		}
-		movement(&game, &game1, &game2, &game3, &game4);
+		movement(&game, &game1, &game2, &game3, &game4, &game5);
 		render(&game, &game1, &game2, &game3, &game4);
 		glXSwapBuffers(dpy, win);
 	}
@@ -221,7 +238,10 @@ void init_opengl(void)
 	//Set 2D mode (no perspective)
 	glOrtho(0, WINDOW_WIDTH, 0, WINDOW_HEIGHT, -1, 1);
 	//Set the screen background color
-	glClearColor(0.1, 0.1, 0.1, 1.0);
+	glClearColor(0.1, 0.1, 0.1, 1.0);   //original 0.1,0.1,0.1,1.0
+	//Do this to allow fonts
+//	glEnable(GL_TEXTURE_2D);
+//	initialize_fonts();
 }
 
 void makeParticle(Game *game, int x, int y)
@@ -295,7 +315,7 @@ int check_keys(XEvent *e, Game *game)
 	return 0;
 }
 
-void movement(Game *game, Game *game1, Game *game2, Game *game3, Game *game4)
+void movement(Game *game, Game *game1, Game *game2, Game *game3, Game *game4, Game *game5)
 {
 	Particle *p;
 
@@ -352,7 +372,7 @@ void movement(Game *game, Game *game1, Game *game2, Game *game3, Game *game4)
 			p->s.center.x <= s2->center.x + s2->width)
        	{
 			p->s.center.y = s2->center.y + s2->height;
-			p->velocity.y = -p->velocity.y * 0.45f;
+			p->velocity.y = -p->velocity.y * 0.4f;
 			p->velocity.x += 0.008f;
 		};
 
@@ -380,11 +400,29 @@ void movement(Game *game, Game *game1, Game *game2, Game *game3, Game *game4)
 			p->s.center.x <= s4->center.x + s4->width)
        	{
 			p->s.center.y = s4->center.y + s4->height;
-			p->velocity.y = -p->velocity.y * 0.35f;
+			p->velocity.y = -p->velocity.y * 0.4f;
 			p->velocity.x += 0.4f;
 		};
 
 //-----------------------------------------------------------		
+
+		//check for collision with circle
+		Shape *s5;
+		s5 = &game5->ball;
+
+
+		GLfloat radius = 0.8f; //radius
+		float x = 750;
+		float y = 0;
+		GLfloat twicePi = 2.0f * M_PI;
+		
+//		if () {
+			for(int j = 0; j <= 100;j++) { 
+				x = s5->center.x + (radius * cos(j * twicePi / 100)); 
+				y = s5->center.y + (radius * sin(j * twicePi / 100));
+			}
+
+//-----------------------------------------------------------
 
 		//check for off-screen
 		if (p->s.center.y < 0.0) {
@@ -392,6 +430,44 @@ void movement(Game *game, Game *game1, Game *game2, Game *game3, Game *game4)
 			game->particle[i] = game->particle[--game->n];
 		}
 	}
+}
+
+void drawFilledCircle(GLfloat x, GLfloat y, GLfloat radius){
+	//code used from https://gist.github.com/strife25/803118
+
+	int triangleAmount = 100; //# of triangles used to draw circle
+	
+	//GLfloat radius = 0.8f; //radius
+	GLfloat twicePi = 2.0f * M_PI;
+
+	glBegin(GL_TRIANGLE_FAN);
+		glVertex2f(x, y); // center of circle
+		for(int i = 0; i <= triangleAmount;i++) { 
+			glVertex2f(
+		        x + (radius * cos(i * twicePi / triangleAmount)), 
+			    y + (radius * sin(i * twicePi / triangleAmount))
+			);
+		}
+	glEnd();
+}
+
+void drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius){
+	//code used from https://gist.github.com/strife25/803118
+
+	int lineAmount = 100; //# of triangles used to draw circle
+	
+	//GLfloat radius = 0.8f; //radius
+	GLfloat twicePi = 2.0f * M_PI;
+	
+	glBegin(GL_LINE_LOOP);
+
+		for(int i = 0; i <= lineAmount;i++) { 
+			glVertex2f(
+			    x + (radius * cos(i * twicePi / lineAmount)), 
+			    y + (radius * sin(i * twicePi / lineAmount))
+			);
+		}
+	glEnd();
 }
 
 void render(Game *game, Game *game1, Game *game2, Game *game3, Game *game4)
@@ -404,7 +480,7 @@ void render(Game *game, Game *game1, Game *game2, Game *game3, Game *game4)
 
 	//draw box
 	Shape *s;
-	glColor3ub(101,96,95);		//original 90,140,90
+	glColor3ub(61,56,55);		//original 90,140,90
 	s = &game->box;
 	glPushMatrix();
 	glTranslatef(s->center.x, s->center.y, s->center.z);
@@ -422,7 +498,7 @@ void render(Game *game, Game *game1, Game *game2, Game *game3, Game *game4)
 
 	//draw box1
 	Shape *s1;
-	glColor3ub(101,96,95);		//original 90,140,90
+	glColor3ub(71,66,65);		//original 90,140,90
 	s1 = &game1->box;
 	glPushMatrix();
 	glTranslatef(s1->center.x, s1->center.y, s1->center.z);
@@ -440,7 +516,7 @@ void render(Game *game, Game *game1, Game *game2, Game *game3, Game *game4)
 
 	//draw box2
 	Shape *s2;
-	glColor3ub(101,96,95);		//original 90,140,90
+	glColor3ub(81,76,75);		//original 90,140,90
 	s2 = &game2->box;
 	glPushMatrix();
 	glTranslatef(s2->center.x, s2->center.y, s2->center.z);
@@ -458,7 +534,7 @@ void render(Game *game, Game *game1, Game *game2, Game *game3, Game *game4)
 
 	//draw box3
 	Shape *s3;
-	glColor3ub(101,96,95);		//original 90,140,90
+	glColor3ub(91,86,85);		//original 90,140,90
 	s3 = &game3->box;
 	glPushMatrix();
 	glTranslatef(s3->center.x, s3->center.y, s3->center.z);
@@ -492,31 +568,38 @@ void render(Game *game, Game *game1, Game *game2, Game *game3, Game *game4)
 
 //-----------------------------------------------------------
 
-	int a,r,b,g;
+	//draw circle
+	glColor3ub(111,106,105);
+	drawFilledCircle(750,0,170);
+	glColor3ub(0,0,0);
+	drawHollowCircle(750,0,170);
+	drawHollowCircle(750,0,169.5);
+	drawHollowCircle(750,0,169);
+	drawHollowCircle(750,0,168.5);
+
+//-----------------------------------------------------------	
 
 	//draw all particles here
+	int a,d,b,g;
 	for (int i = 0; i <game->n; i++) {
 		
 		a = rand()%5;
-			if(a == 1)
-			{
-				r = 73;
+			if(a == 1) {
+				d = 73;
 				b = 113;
 				g = 156;
-
 			}
-			else
-			{	
-				r = 57;
+			else {	
+				d = 57;
 				b = 88;
 				g = 121;
 			}
 
 		glPushMatrix();
-		glColor3ub(r,b,g);    //original 150,160,220
+		glColor3ub(d,b,g);    //original 150,160,220
 		Vec *c = &game->particle[i].s.center;
-		w = 4;
-		h = 4;
+		w = 5;
+		h = 5;
 		glBegin(GL_QUADS);
 			glVertex2i(c->x-w, c->y-h);
 			glVertex2i(c->x-w, c->y+h);
@@ -525,4 +608,24 @@ void render(Game *game, Game *game1, Game *game2, Game *game3, Game *game4)
 		glEnd();
 		glPopMatrix();
 	}
+
+	//text is here
+	//I couldn't get this code to work
+//	int yres=480;
+	//
+//	Rect r;
+//	glClear(GL_COLOR_BUFFER_BIT);
+	//
+//	r.bot = yres - 20;
+//	r.left = 10;
+//	r.center = 0;
+//	ggprint8b(&r, 16, 0x00ff00, "Waterfall");
 }
+
+
+
+
+
+
+
+
