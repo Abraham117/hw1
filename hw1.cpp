@@ -83,7 +83,7 @@ void init_opengl(void);
 void cleanupXWindows(void);
 void check_mouse(XEvent *e, Game *game);
 int check_keys(XEvent *e, Game *game);
-void movement(Game *game, Game *game1, Game *game2, Game *game3, Game *game4, Game *game5);
+void movement(Game *game, Game *game1, Game *game2, Game *game3, Game *game4);
 void drawFilledCircle(GLfloat x, GLfloat y, GLfloat radius);
 void drawHollowCircle(GLfloat x, GLfloat y, GLfloat radius);
 void render(Game *game, Game *game1, Game *game2, Game *game3, Game *game4);
@@ -177,7 +177,7 @@ int main(void)
 			check_mouse(&e, &game);
 			done = check_keys(&e, &game);
 		}
-		movement(&game, &game1, &game2, &game3, &game4, &game5);
+		movement(&game, &game1, &game2, &game3, &game4);
 		render(&game, &game1, &game2, &game3, &game4);
 		glXSwapBuffers(dpy, win);
 	}
@@ -240,8 +240,8 @@ void init_opengl(void)
 	//Set the screen background color
 	glClearColor(0.1, 0.1, 0.1, 1.0);   //original 0.1,0.1,0.1,1.0
 	//Do this to allow fonts
-//	glEnable(GL_TEXTURE_2D);
-//	initialize_fonts();
+	glEnable(GL_TEXTURE_2D);
+	initialize_fonts();
 }
 
 void makeParticle(Game *game, int x, int y)
@@ -315,7 +315,7 @@ int check_keys(XEvent *e, Game *game)
 	return 0;
 }
 
-void movement(Game *game, Game *game1, Game *game2, Game *game3, Game *game4, Game *game5)
+void movement(Game *game, Game *game1, Game *game2, Game *game3, Game *game4)
 {
 	Particle *p;
 
@@ -609,18 +609,40 @@ void render(Game *game, Game *game1, Game *game2, Game *game3, Game *game4)
 	}
 
 	//text is here
-	//I couldn't get this code to work
-//	int yres=480;
+	int yres=480;
 	//
-//	Rect r;
+	Rect r;
 //	glClear(GL_COLOR_BUFFER_BIT);
 	//
-//	r.bot = yres - 20;
-//	r.left = 10;
-//	r.center = 0;
-//	ggprint8b(&r, 16, 0x00ff00, "Waterfall");
-}
+	r.bot = yres -10;
+	r.left = 100;
+	r.center = 0;
+	ggprint8b(&r, 16, 0xffffff, "Requirements");
 
+
+	r.bot = yres -70;
+	r.left = 180;
+	r.center = 0;
+	ggprint8b(&r, 16, 0xffffff, "Design");
+
+
+	r.bot = yres -130;
+	r.left = 260;
+	r.center = 0;
+	ggprint8b(&r, 16, 0xffffff, "Coding");
+
+
+	r.bot = yres -190;
+	r.left = 340;
+	r.center = 0;
+	ggprint8b(&r, 16, 0xffffff, "Testing");
+
+	
+	r.bot = yres -250;
+	r.left = 420;
+	r.center = 0;
+	ggprint8b(&r, 16, 0xffffff, "Maintenance");
+}
 
 
 
