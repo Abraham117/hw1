@@ -34,9 +34,9 @@
 #include <X11/Xlib.h>
 #include <X11/keysym.h>
 #include <GL/glx.h>
-//extern "C" {
-//	#include "fonts.h"
-//}
+extern "C" {
+	#include "fonts.h"
+}
 
 #define WINDOW_WIDTH  800
 #define WINDOW_HEIGHT 600
@@ -407,21 +407,20 @@ void movement(Game *game, Game *game1, Game *game2, Game *game3, Game *game4, Ga
 //-----------------------------------------------------------		
 
 		//check for collision with circle
-		Shape *s5;
-		s5 = &game5->ball;
+		//Shape *s5;
+		//s5 = &game5->ball;
 
 
-		GLfloat radius = 0.8f; //radius
-		float x = 750;
-		float y = 0;
-		GLfloat twicePi = 2.0f * M_PI;
+		//GLfloat radius = 0.8f; //radius
+		//float x = 750;
+		//float y = 0;
+		//GLfloat twicePi = 2.0f * M_PI;
 		
 //		if () {
-			for(int j = 0; j <= 100;j++) { 
-				x = s5->center.x + (radius * cos(j * twicePi / 100)); 
-				y = s5->center.y + (radius * sin(j * twicePi / 100));
-			}
-
+			//for(int j = 0; j <= 100;j++) { 
+				//x = s5->center.x + (radius * cos(j * twicePi / 100)); 
+				//y = s5->center.y + (radius * sin(j * twicePi / 100));
+	//}
 //-----------------------------------------------------------
 
 		//check for off-screen
